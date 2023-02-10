@@ -1,0 +1,66 @@
+library("tibble")
+library("lubridate")
+library("readr")
+library("dplyr")
+library("stringr")
+
+read_files <- function(path = "./data/stocks/",
+                      start = "2019-01-01",
+                      end = "2021-12-31",
+                      new_first = TRUE){
+  start <- ymd(start)
+  end <- ymd(end)
+  files <- list.files(path)
+  data <- list()
+  for(f in files){
+    file_path <- paste0(path, f)
+    symbol <- str_split(f, "_")[[1]][1]
+    tib <- read_csv(file_path, show_col_types = FALSE)
+    tib <- tib %>% filter(Date >= start & Date <= end)
+    if(new_first)
+      tib <- tib %>% arrange(desc(Date))
+    data[[symbol]] <- tib
+  }
+  data
+}
+
+same_length <- function(data){
+  #Data is a list created with read_files function
+  n_obs <- c()
+  for(s in names(data)){
+    n_obs <- c(n_obs, nrow(data[[s]]))
+  }
+  if(length(unique(n_obs)) != 1 ){
+    return(FALSE)
+  }
+  TRUE
+}
+
+norm_by_col <- function(data, target_cols = c("High", "Low", "Close"),
+                        norm_col = "Open"){
+  norm_data <- list()
+  for(s in names(data)){
+    norm_data[[s]] <- tibble(data[[s]][target_cols] / data[[s]][[norm_col]])
+  }
+  norm_data
+}
+
+transp_and_flat <- function(data){
+  # data is a list with tibbles
+  # all of them with the same number of rows and columns
+  sym <- names(data)
+  n_row <- nrow(data[[sym[1]]])
+  n_col <- ncol(data[[sym[1]]])
+  flat_data <- matrix(0, nrow = length(sym), ncol = n_row * n_col)
+  for(i in seq_along(sym)){
+    flat_data[i, ] <- unlist(data[[sym[i]]])
+  }
+  rownames(flat_data) <- sym
+  flat_data
+}
+
+tibble_clusters <- function(y_clust, symb){
+  # y_clust a vector with cluster assignment
+  # for each observation
+  tibble(Symbol = symb, cluster = y_clust)
+}
