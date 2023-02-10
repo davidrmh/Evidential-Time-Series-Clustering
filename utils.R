@@ -64,3 +64,30 @@ tibble_clusters <- function(y_clust, symb){
   # for each observation
   tibble(Symbol = symb, cluster = y_clust)
 }
+
+compute_returns <- function(data, cols= c("Adj Close"),
+                            keep_dates = FALSE, new_first = TRUE){
+  # data is a list created with the function `read_files`
+  
+  ret <- list()
+  for (s in names(data)){
+    d <- data[[s]]
+    nobs <- nrow(d)
+    if(new_first){
+      ret[[s]] <- as_tibble(d[1:nobs-1, cols] / d[2:nobs, cols] - 1)
+      if(keep_dates){
+        ret[[s]][["Date"]] <- d[["Date"]][1:nobs-1]
+        ret[[s]] <- ret[[s]] %>% relocate(Date)
+      }
+      
+    }
+    else{
+      ret[[s]] <- as_tibble(d[2:nobs, cols] / d[1:nobs-1, cols] - 1)
+      if(keep_dates){
+        ret[[s]][["Date"]] <- d[["Date"]][2:nobs]
+        ret[[s]] <- ret[[s]] %>% relocate(Date)
+      }
+    }
+  }
+  ret
+}
