@@ -91,3 +91,34 @@ compute_returns <- function(data, cols= c("Adj Close"),
   }
   ret
 }
+
+plot_cluster <- function(data, ...){
+  # data is a tibble
+  # with at least columns Symbol, x, y and cluster
+  # ... are parameters passed to plot and text functions
+  # These last parameters should be passed as key = value
+  # pairs.
+  params <- list(...)
+  if(!("main" %in% names(params)))
+    params[["main"]] <- "Cluster"
+  if(!("pch" %in% names(params)))
+    params[["pch"]] <- 16
+
+  if(!("cex" %in% names(params)))
+    params[["cex"]] <- 0.8
+
+  if(!("pos" %in% names(params)))
+    params[["pos"]] <- 1
+  
+  if(!("font" %in% names(params)))
+    params[["font"]] <- 2
+  
+  plot(data$x, data$y, xlab = "X", ylab = "Y", main = params[["main"]],
+       col = data$cluster, pch = params[["pch"]])
+  
+  text(data$x, data$y, labels = data$Symbol, 
+       col =  data$cluster, cex = params[["cex"]],
+       font = params[["font"]], pos = params[["pos"]])
+  
+  grid(col = "black")
+}
