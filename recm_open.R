@@ -11,8 +11,8 @@ new_first <- TRUE
 norm_col <- "Open"
 target_cols <- c("High", "Low", "Close")
 path_industry <- "./data/stock_industry.csv"
-n_clust <- 2
-perp <- 15
+n_clust <- 3
+perp <- 10
 
 # Read csv with symbols names and industry
 tib_indus <- read_csv(path_industry, show_col_types = FALSE)
@@ -52,9 +52,17 @@ recm_bel <- tib_indus %>% left_join(recm_bel, by = "Symbol")
 recm_bel <- recm_bel %>% left_join(tsne, by = "Symbol")
 
 # Plot results from RECM using Plausibility
-plot(recm_pl$x, recm_pl$y, xlab = "X", ylab = "Y", main = "RECM-Plausibility",
-     col = recm_pl$cluster, pch = 19)
+plot_cluster(recm_pl,
+             main = "RECM-Plausibility",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot results from ECM using Belief
-plot(recm_bel$x, recm_bel$y, xlab = "X", ylab = "Y", main = "RECM-Belief",
-     col = recm_bel$cluster, pch = 19)
+plot_cluster(recm_bel,
+             main = "RECM-Belief",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)

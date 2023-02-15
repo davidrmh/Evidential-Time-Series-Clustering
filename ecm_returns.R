@@ -85,29 +85,49 @@ ecm_bel_ohcl <- tib_indus %>% left_join(ecm_bel_ohcl, by = "Symbol")
 ecm_bel_ohcl <- ecm_bel_ohcl %>% left_join(tsne_ohcl, by = "Symbol")
 
 # Plot K-Means using Adj Close prices
-plot(km_adj$x, km_adj$y, xlab = "X", ylab ="Y", main = "K-means-Adj Close",
-     col = km_adj$cluster, pch = 19)
+plot_cluster(km_adj,
+             main = "K-means-Adj Close",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot ECM using Adj Close Prices and Plausibility
-plot(ecm_pl_adj$x, ecm_pl_adj$y, xlab = "X", ylab = "Y", 
-     main = "ECM-Plausibility-Adj Close",
-     col = ecm_pl_adj$cluster, pch = 19)
+plot_cluster(ecm_pl_adj,
+             main = "ECM-Plausibility-Adj Close",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot ECM using Adj Close Prices and Belief
-plot(ecm_bel_adj$x, ecm_bel_adj$y, xlab = "X", ylab = "Y", 
-     main = "ECM-Belief-Adj Close",
-     col = ecm_bel_adj$cluster, pch = 19)
+plot_cluster(ecm_bel_adj,
+             main = "ECM-Belief-Adj Close",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot K-Means using OHCL prices
-plot(km_ohcl$x, km_ohcl$y, xlab = "X", ylab ="Y", main = "K-means-OHCL",
-     col = km_ohcl$cluster, pch = 19)
+plot_cluster(km_ohcl,
+             main = "K-means-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot ECM using OHCL Prices and Plausibility
-plot(ecm_pl_ohcl$x, ecm_pl_ohcl$y, xlab = "X", ylab = "Y", 
-     main = "ECM-Plausibility-OHCL",
-     col = ecm_pl_ohcl$cluster, pch = 19)
+plot_cluster(ecm_pl_ohcl,
+             main = "ECM-Plausibility-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot ECM using OHCL Prices and Belief
-plot(ecm_bel_ohcl$x, ecm_bel_ohcl$y, xlab = "X", ylab = "Y", 
-     main = "ECM-Belief-OHCL",
-     col = ecm_bel_ohcl$cluster, pch = 19)
+plot_cluster(ecm_bel_ohcl,
+             main = "ECM-Belief-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)

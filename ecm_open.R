@@ -10,7 +10,7 @@ new_first <- TRUE
 norm_col <- "Open"
 target_cols <- c("High", "Low", "Close")
 path_industry <- "./data/stock_industry.csv"
-n_clust <- 3
+n_clust <- 4
 perp <- 15
 
 # Read csv with symbols names and industry
@@ -60,13 +60,25 @@ ecm_bel <- tib_indus %>% left_join(ecm_bel, by = "Symbol")
 ecm_bel <- ecm_bel %>% left_join(tsne, by = "Symbol")
 
 # Plot results for classical K-means
-plot(km$x, km$y, xlab = "X", ylab ="Y", main = "K-means",
-     col = km$cluster, pch = 19)
+plot_cluster(km,
+             main = "K-means-norm-open",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot results from ECM using Plausibility
-plot(ecm_pl$x, ecm_pl$y, xlab = "X", ylab = "Y", main = "ECM-Plausibility",
-     col = ecm_pl$cluster, pch = 19)
+plot_cluster(ecm_pl,
+             main = "ECM-Plausibility-norm-open",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
 
 # Plot results from ECM using Belief
-plot(ecm_bel$x, ecm_bel$y, xlab = "X", ylab = "Y", main = "ECM-Belief",
-     col = ecm_bel$cluster, pch = 19)
+plot_cluster(ecm_bel,
+             main = "ECM-Belief-norm-open",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
