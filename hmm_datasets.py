@@ -1,6 +1,7 @@
 import os
-import jax
+import jax.numpy as jnp
 import pandas as pd
+import numpy as np
 from typing import Union, Tuple, Optional
 from jaxtyping import Float, Array
 from copy import deepcopy
@@ -79,11 +80,17 @@ def join(data: StockData) -> pd.DataFrame:
         rsuf = keys[i]
         df = df.join(data[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
     return df
-        
+
+def create_batches(data: np.Array, period_len: int) -> Array:
+    for 
+    
+    
+
 path = './data/stocks'
 old_first = True
 sep = '_'
 stocks = StockData(path, old_first, sep)
 norm_stocks = norm_hlc_by_open(stocks, inplace = False)
 data = join(norm_stocks)
-data = drop_cols(data, keep = r'(^High|^Low|^Close)')
+data = drop_cols(data, keep = r'(^High|^Low|^Close)').to_numpy()
+data = jnp.array(data)
