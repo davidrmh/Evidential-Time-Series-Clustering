@@ -81,16 +81,102 @@ def join(data: StockData) -> pd.DataFrame:
         df = df.join(data[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
     return df
 
-def create_batches(data: np.Array, period_len: int) -> Array:
-    for 
+def create_batches(data: Array, period_len: int, old_first: bool = True) -> Array:
+    """
+    data is an array with shape (total_obs, emission_dim).
+    when old_first is True the oldest observation is the first observation in the data.
+    The result is an array with shape (batches, period_len, emission_dim).
     
+    """
     
+    total_steps, obs_dim = data.shape
+    
+    # Bottom up approach (oldest observation is in the top of the table)
+    if old_first:
+        
+        # First batch is obtained manually
+        batch_count = 1
+        start_idx = total_steps - batch_count * period_len
+        end_idx = total_steps - (batch_count - 1) * period_len
+        
+        batches = data[start_idx:end_idx, :]
+        batches = batches.reshape((1, *batches.shape))
+        
+        batch_count = batch_count + 1
+        start_idx = total_steps - batch_count * period_len
+        end_idx = total_steps - (batch_count - 1) * period_len
+        
+        while start_idx >= 0:
+            # Get the new batch
+            tmp = data[start_idx:end_idx, :]
+            
+            # Reshape
+            tmp = tmp.reshape((1, *tmp.shape))
+            
+            # Concatenate with previous batches (axis = 0)
+            batches = jnp.concatenate((batches, tmp), axis = 0)
+            
+            # Update indexes
+            batch_count = batch_count + 1
+            start_idx = total_steps - batch_count * period_len
+            end_idx = total_steps - (batch_count - 1) * period_len
+    
+        return batches
+    
+    # Top to bottom approach (newest observation is in the top of the table)
+    
+    # First batch is obtained manually
+    batch_count = 1
+    start_idx = (batch_count - 1) * period_len
+    end_idx = batch_count * period_len
+        
+    batches = data[start_idx:end_idx, :]
+    batches = batches.reshape((1, *batches.shape))
+        
+    batch_count = batch_count + 1
+    start_idx = (batch_count - 1) * period_len
+    end_idx = batch_count * period_len
+        
+    while end_idx < total_steps:
+        # Get the new batch
+        tmp = data[start_idx:end_idx, :]
+            
+        # Reshape
+        tmp = tmp.reshape((1, *tmp.shape))
+            
+        # Concatenate with previous batches (axis = 0)
+        batches = jnp.concatenate((batches, tmp), axis = 0)
+            
+        # Update indexes
+        batch_count = batch_count + 1
+        start_idx = (batch_count - 1) * period_len
+        end_idx = batch_count * period_len
+        
+    return batches 
+
+def batches_norm_hlc_by_open(stocks: StockData, period_len: int = 15):
+    
+    # Normalize data by diving over open price
+    norm_stocks = norm_hlc_by_open(stocks, inplace = False)
+    
+    # Join tables
+    data = join(norm_stocks)
+    
+    # Drop unnecesary columns
+    data = drop_cols(data, keep = r'(^High|^Low|^Close)').to_numpy()
+    data = jnp.array(data)
+    
+    # Get batches
+    batches = create_batches(data, period_len, stocks.old_first)
+    
+    return batches
+    
+
 
 path = './data/stocks'
 old_first = True
 sep = '_'
 stocks = StockData(path, old_first, sep)
-norm_stocks = norm_hlc_by_open(stocks, inplace = False)
-data = join(norm_stocks)
-data = drop_cols(data, keep = r'(^High|^Low|^Close)').to_numpy()
-data = jnp.array(data)
+period_len = 15
+batches_hlc = batches_norm_hlc_by_open(stocks, period_len)
+
