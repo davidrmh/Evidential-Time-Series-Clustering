@@ -28,7 +28,16 @@ class StockData(dict):
                 self.data[symbol] = df
                 #Rename columns
                 newnames = {col:f'{col}_{symbol}' for col in df.columns}
-                df.rename(columns = newnames, inplace = True)        
+                df.rename(columns = newnames, inplace = True)
+    
+    def join(self) -> pd.DataFrame:
+        keys = list(self.keys())
+        df = self[keys[0]]
+        for i in range(1, len(keys)):
+            lsuf = keys[i-1]
+            rsuf = keys[i]
+            df = df.join(self[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
+        return df
                 
     def __getitem__(self, key):
         return self.data[key]
@@ -71,15 +80,6 @@ def drop_cols(dataframe: pd.DataFrame, keep: str) -> pd.DataFrame:
     r'(^Open|Close|^Low|^High)': Keeps Open Close Low High and Adj Close
     """
     return dataframe.filter(regex = keep, axis = 1)
-
-def join(data: StockData) -> pd.DataFrame:
-    keys = list(data.keys())
-    df = data[keys[0]]
-    for i in range(1, len(keys)):
-        lsuf = keys[i-1]
-        rsuf = keys[i]
-        df = df.join(data[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
-    return df
 
 def create_batches(data: Array, period_len: int, old_first: bool = True) -> Array:
     """
@@ -160,7 +160,7 @@ def batches_norm_hlc_by_open(stocks: StockData, period_len: int = 15):
     norm_stocks = norm_hlc_by_open(stocks, inplace = False)
     
     # Join tables
-    data = join(norm_stocks)
+    data = stocks.join()
     
     # Drop unnecesary columns
     data = drop_cols(data, keep = r'(^High|^Low|^Close)').to_numpy()
