@@ -3,6 +3,7 @@ library("lubridate")
 library("readr")
 library("dplyr")
 library("stringr")
+library("ggplot2")
 
 read_files <- function(path = "./data/stocks/",
                       start = "2019-01-01",
@@ -152,4 +153,39 @@ to_base_100 <- function(tib){
   tib$`Adj Close` <- 100 * tib$`Adj Close` / x1
   tib
 }
+
+plot_ts_cluster <- function(prices, tib_clus){
+  # Prices is a list of tibbles containing the prices
+  # tib_clus is a tibble with at least columns Symbol and cluster
+  
+  # Get cluster id
+  clus_id <- min(tib_clus$cluster):max(tib_clus$cluster)
+  
+  for(i in clus_id){
+    col <- 1
+    tib <- tibble()
+    # Find cluster members
+    sym_clus <- tib_clus %>% filter(cluster == i) %>% select(Symbol)
+    
+    # Collect price data in 100 base
+    for(s in sym_clus$Symbol){
+      tib100 <- to_base_100(prices[[s]])
+      tib100$color <- col
+      tib100$Symbol <- s
+      tib <- rbind(tib, tib100)
+      col <- col + 1
+    }
+    
+    # Plot data
+    g <- ggplot(tib, aes(x = Date,
+                         y = `Adj Close`,
+                         colour = as.factor(color)))
+    g <- g + geom_line(linewidth = 1.5, alpha = 0.6)
+    g <- g + scale_color_discrete(name = "Symbol", label = unique(tib$Symbol))
+    g<- g + ggtitle(paste0("Cluster ", i))
+    plot(g)
+  }
+  
+}
+
 
