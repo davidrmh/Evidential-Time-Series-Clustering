@@ -20,7 +20,7 @@
   
 
 ## Some ideas
-
+### Spectral clustering and embedding with hidden Markov models
 The paper **2007-Spectral clustering and embedding with hidden Markov models** presents an approach for obtaining a Mercer kernel. We can use this kernel to measure the affinity between two HMMs. It would be interesting if:
 
 * Using said kernel, we apply relational evidential clustering algorithm.
@@ -30,3 +30,17 @@ The paper **2007-Spectral clustering and embedding with hidden Markov models** p
 * Do pairs trading with these stocks.
 
 * Ignoring clusters we could also use the kernel to detect the “globally” less affine pair of stocks and do pairs trading strategies.
+
+### Correlation matrix and pairs trading
+
+* In principle, if $S_1$ and $S_2$ belong to the same cluster, then they have a positive correlation. This is supported by some plots I made in **R**.
+
+* In line with this observation:
+    
+    * For each cluster we can compute the correlation matrix of price returns (Adj Close price).
+    
+    * Detect the lowest correlation cofficient in the matrix.
+    
+    * Create the pair $(S_i, S_j)$ corresponding to this correlation coefficient and do pairs trading.
+    
+    * I need to think how to use the uncertainty quantification in my favor.
