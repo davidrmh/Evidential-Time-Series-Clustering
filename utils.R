@@ -96,7 +96,7 @@ plot_cluster <- function(data, ...){
   # data is a tibble
   # with at least columns Symbol, x, y and cluster
   # ... are parameters passed to plot and text functions
-  # These last parameters should be passed as key = value
+  # These last parameters must be passed as key = value
   # pairs.
   params <- list(...)
   if(!("main" %in% names(params)))
@@ -121,4 +121,18 @@ plot_cluster <- function(data, ...){
        font = params[["font"]], pos = params[["pos"]])
   
   grid(col = "black")
+}
+
+get_approx <- function(app, sym){
+  # app is a lower.approx or upper.approx from a credpart object
+  # sym is a vector of characters with stock tickers
+  Symbol <- c()
+  cluster <- c()
+  for(i in seq_along(app)){
+    n_elem <- length(app[[i]])
+    Symbol <- c(Symbol, sym[app[[i]]])
+    cluster <- c(cluster, rep(i, n_elem))
+  }
+  tibble(Symbol = Symbol, cluster = cluster)
+  
 }
