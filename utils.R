@@ -134,5 +134,22 @@ get_approx <- function(app, sym){
     cluster <- c(cluster, rep(i, n_elem))
   }
   tibble(Symbol = Symbol, cluster = cluster)
-  
 }
+
+to_base_100 <- function(tib){
+  # Use Adj Close price
+  # The returned tibble is ordered in ascending order
+  # that is, from oldest to newest prices
+  
+  # Select only Adj Close and Date columns
+  tib <- tib %>% select(Date, "Adj Close")
+  
+  # Order according to Date
+  tib <- tib[order(tib$Date, decreasing = FALSE), ]
+  
+  # Convert to base 100 prices
+  x1 <- tib$`Adj Close`[1]
+  tib$`Adj Close` <- 100 * tib$`Adj Close` / x1
+  tib
+}
+
