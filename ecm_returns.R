@@ -9,7 +9,7 @@ end <- "2022-01-31"
 new_first <- TRUE
 path_industry <- "./data/stock_industry.csv"
 n_clust <- 3
-perp <- 15
+perp <- 16
 
 # Read csv with symbols names and industry
 tib_indus <- read_csv(path_industry, show_col_types = FALSE)
@@ -84,6 +84,27 @@ ecm_bel_ohcl <- tibble_clusters(ecm_clust_ohcl$y.bel, names(data))
 ecm_bel_ohcl <- tib_indus %>% left_join(ecm_bel_ohcl, by = "Symbol")
 ecm_bel_ohcl <- ecm_bel_ohcl %>% left_join(tsne_ohcl, by = "Symbol")
 
+# Lower approximation using OHCL data
+ecm_low_ohcl <- get_approx(ecm_clust_ohcl$lower.approx, names(data))
+ecm_low_ohcl <- tib_indus %>% left_join(ecm_low_ohcl, by = "Symbol")
+ecm_low_ohcl <- ecm_low_ohcl %>% left_join(tsne_ohcl, by = "Symbol")
+
+# Lower approximation using OHCL data
+ecm_up_ohcl <- get_approx(ecm_clust_ohcl$upper.approx, names(data))
+ecm_up_ohcl <- tib_indus %>% left_join(ecm_up_ohcl, by = "Symbol")
+ecm_up_ohcl <- ecm_up_ohcl %>% left_join(tsne_ohcl, by = "Symbol")
+
+# Lower approximation using Adj Close data
+ecm_low_adj <- get_approx(ecm_clust_adj$lower.approx, names(data))
+ecm_low_adj <- tib_indus %>% left_join(ecm_low_adj, by = "Symbol")
+ecm_low_adj <- ecm_low_adj %>% left_join(tsne_adj, by = "Symbol")
+
+# Upper approximation using Adj Close data
+ecm_up_adj <- get_approx(ecm_clust_adj$upper.approx, names(data))
+ecm_up_adj <- tib_indus %>% left_join(ecm_up_adj, by = "Symbol")
+ecm_up_adj <- ecm_up_adj %>% left_join(tsne_adj, by = "Symbol")
+
+
 # Plot K-Means using Adj Close prices
 plot_cluster(km_adj,
              main = "K-means-Adj Close",
@@ -127,6 +148,38 @@ plot_cluster(ecm_pl_ohcl,
 # Plot ECM using OHCL Prices and Belief
 plot_cluster(ecm_bel_ohcl,
              main = "ECM-Belief-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot Lower Approximation from ECM using OHCL
+plot_cluster(ecm_low_ohcl,
+             main = "ECM-Low-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot Upper Approximation from ECM using OHCL
+plot_cluster(ecm_up_ohcl,
+             main = "ECM-Upper-OHCL",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot Lower Approximation from ECM using Adj Close
+plot_cluster(ecm_low_adj,
+             main = "ECM-Low-Adj",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot Upper Approximation from ECM using Adj Close
+plot_cluster(ecm_up_adj,
+             main = "ECM-Up-Adj",
              pch = 16,
              cex = 0.8,
              font = 2,
