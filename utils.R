@@ -159,7 +159,8 @@ plot_ts_cluster <- function(prices, tib_clus){
   # tib_clus is a tibble with at least columns Symbol and cluster
   
   # Get cluster id
-  clus_id <- min(tib_clus$cluster):max(tib_clus$cluster)
+  clus_id <- unique(tib_clus$cluster)
+  clus_id <- sort(clus_id)
   
   for(i in clus_id){
     col <- 1
