@@ -10,8 +10,8 @@ new_first <- TRUE
 norm_col <- "Open"
 target_cols <- c("High", "Low", "Close")
 path_industry <- "./data/stock_industry.csv"
-n_clust <- 4
-perp <- 15
+n_clust <- 3
+perp <- 16
 
 # Read csv with symbols names and industry
 tib_indus <- read_csv(path_industry, show_col_types = FALSE)
@@ -59,6 +59,16 @@ ecm_bel <- tibble_clusters(ecm_clust$y.bel, names(data))
 ecm_bel <- tib_indus %>% left_join(ecm_bel, by = "Symbol")
 ecm_bel <- ecm_bel %>% left_join(tsne, by = "Symbol")
 
+# Lower approximation
+ecm_low <- get_approx(ecm_clust$lower.approx, names(data))
+ecm_low <- tib_indus %>% left_join(ecm_low, by = "Symbol")
+ecm_low <- ecm_low %>% left_join(tsne, by = "Symbol")
+
+# Upper approximation
+ecm_up <- get_approx(ecm_clust$upper.approx, names(data))
+ecm_up <- tib_indus %>% left_join(ecm_up, by = "Symbol")
+ecm_up <- ecm_up %>% left_join(tsne, by = "Symbol")
+
 # Plot results for classical K-means
 plot_cluster(km,
              main = "K-means-norm-open",
@@ -78,6 +88,22 @@ plot_cluster(ecm_pl,
 # Plot results from ECM using Belief
 plot_cluster(ecm_bel,
              main = "ECM-Belief-norm-open",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot lower approximation from ECM
+plot_cluster(ecm_low,
+             main = "ECM-Low-Approx-norm-open",
+             pch = 16,
+             cex = 0.8,
+             font = 2,
+             pos = 1)
+
+# Plot upper approximation from ECM
+plot_cluster(ecm_up,
+             main = "ECM-Up-Approx-norm-open",
              pch = 16,
              cex = 0.8,
              font = 2,
