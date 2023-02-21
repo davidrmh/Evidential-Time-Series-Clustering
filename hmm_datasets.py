@@ -204,7 +204,7 @@ def batches_norm_hlc_by_open(stocks: StockData, period_len: int = 15):
     norm_stocks = norm_hlc_by_open(stocks, inplace = False)
     
     # Join tables
-    data = stocks.join()
+    data = join(norm_stocks)
     
     # Drop unnecesary columns
     data = drop_cols(data, keep = r'(^High|^Low|^Close)').to_numpy()
@@ -215,13 +215,3 @@ def batches_norm_hlc_by_open(stocks: StockData, period_len: int = 15):
     
     return batches
     
-
-
-path = './data/stocks'
-old_first = True
-sep = '_'
-stocks = StockData(path, old_first, sep)
-returns = stocks.get_log_returns()
-period_len = 15
-batches_hlc = batches_norm_hlc_by_open(stocks, period_len)
-
