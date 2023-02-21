@@ -186,7 +186,39 @@ plot_ts_cluster <- function(prices, tib_clus){
     g<- g + ggtitle(paste0("Cluster ", i))
     plot(g)
   }
-  
 }
+
+get_cor_clus <- function(ret, tib_clus){
+  # ret is a list created with compute_returns function setting
+  # the parameter keep_dates as FALSE
+  # tib_clus is a tibble with at least columns Symbol and cluster
+  
+  # Get cluster id
+  clus_id <- unique(tib_clus$cluster)
+  clus_id <- sort(clus_id)
+  corre <- list()
+  for(i in clus_id){
+    # Find cluster members
+    sym_clus <- tib_clus %>% filter(cluster == i) %>% select(Symbol)
+    sym_clus <- as.vector(sym_clus$Symbol)
+    
+    if(length(sym_clus) == 0) next
+    
+    # Concatenate returns in a dataframe
+    df_ret <- reduce(ret[sym_clus], cbind)
+    names(df_ret) <- sym_clus
+    
+    # Compute correlations
+    # Consider clusters with at least two elements
+    # due to this list corre will contain NULL elements
+    if(length(sym_clus) > 1){
+      corre[[i]] <- cor(df_ret)
+    }
+    
+  }
+  corre
+}
+
+#get_pairs <- function(corre)
 
 
