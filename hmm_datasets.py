@@ -8,11 +8,18 @@ from copy import deepcopy
 
 
 class StockData(dict):
-    def __init__(self, path: str, old_first: bool = True, sep: str = "_"):
+    def __init__(self,
+                 path: str,
+                 start: str = '2015-01-01',
+                 end: str = '2023-01-31',
+                 old_first: bool = True, 
+                 sep: str = "_"):
         """
         Args:
             :param path(str): path of the directory containing the csv file with stock prices (from Yahoo Finance).
             :param old_first(bool): If True, the oldest observation is in the top of the table.
+            :param start(str): String in format YYYY-MM-DD. Start date.
+            :param end(str): String in format YYYY-MM-DD. End date.
             :param sep(str): string separating the stock's symbol from the rest of the name of the file.
             the name of the file must follow the pattern SYMBOL + sep + REST.csv
         """
@@ -21,14 +28,22 @@ class StockData(dict):
         self.old_first = old_first
         for f in self.files:
             if "csv" in f:
+                # Read CSV
                 file_path = os.path.join(path, f)
                 df = pd.read_csv(file_path, index_col = "Date")
+                
+                # Sort date according to old_first
                 df.sort_index(ascending = old_first, inplace = True)
+                
+                # Filter data in date ranges
+                df = df.loc[start:end]
+                
+                # Rename columns
                 symbol = f.split(sep)[0]
-                self.data[symbol] = df
-                #Rename columns
                 newnames = {col:f'{col}_{symbol}' for col in df.columns}
                 df.rename(columns = newnames, inplace = True)
+                self.data[symbol] = df
+                
 
     def get_log_returns(self):
         """
