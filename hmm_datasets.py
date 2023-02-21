@@ -38,6 +38,31 @@ class StockData(dict):
             rsuf = keys[i]
             df = df.join(self[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
         return df
+    
+    def get_log_returns(self):
+        """
+        Obtain the log returns for each stock series.
+        Adj Close prices are used
+
+        Returns
+        -------
+        Dictionary with pandas series containing the returns.
+
+        """
+        dict_ret = {}
+        for s in self.keys():    
+            # For simplicity sorts the data from oldest to newest
+            d = self[s]
+            d = d.sort_index(ascending = True)
+            nobs = d.shape[0]
+            dates = d.index.values
+            
+            # Use Adj Close prices
+            d = d.filter(regex = r"^Adj", axis = 1).to_numpy()
+            ret = np.log(d[1:nobs]) - np.log(d[0:nobs - 1])
+            ret = pd.Series(ret.ravel(), index = dates[1:nobs])
+            dict_ret[s] = ret
+        return dict_ret
                 
     def __getitem__(self, key):
         return self.data[key]
@@ -177,6 +202,7 @@ path = './data/stocks'
 old_first = True
 sep = '_'
 stocks = StockData(path, old_first, sep)
+returns = stocks.get_log_returns()
 period_len = 15
 batches_hlc = batches_norm_hlc_by_open(stocks, period_len)
 
