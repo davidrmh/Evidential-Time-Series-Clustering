@@ -29,16 +29,7 @@ class StockData(dict):
                 #Rename columns
                 newnames = {col:f'{col}_{symbol}' for col in df.columns}
                 df.rename(columns = newnames, inplace = True)
-    
-    def join(self) -> pd.DataFrame:
-        keys = list(self.keys())
-        df = self[keys[0]]
-        for i in range(1, len(keys)):
-            lsuf = keys[i-1]
-            rsuf = keys[i]
-            df = df.join(self[keys[i]], lsuffix  = f'_{lsuf}', rsuffix = f'_{rsuf}', on  = 'Date', how = 'left')
-        return df
-    
+
     def get_log_returns(self):
         """
         Obtain the log returns for each stock series.
@@ -60,7 +51,9 @@ class StockData(dict):
             # Use Adj Close prices
             d = d.filter(regex = r"^Adj", axis = 1).to_numpy()
             ret = np.log(d[1:nobs]) - np.log(d[0:nobs - 1])
-            ret = pd.Series(ret.ravel(), index = dates[1:nobs])
+            ret = pd.DataFrame(ret.ravel(), index = dates[1:nobs])
+            ret = ret.rename_axis(index = "Date")
+            ret = ret.rename(columns = {0: f'Adj Close_{s}'})
             dict_ret[s] = ret
         return dict_ret
                 
@@ -76,7 +69,33 @@ class StockData(dict):
     def values(self):
         return self.data.values()
 
-    
+def join(data) -> pd.DataFrame:
+    """
+    Join data in a DataFrame.
+
+    Parameters
+    ----------
+    data : Dictionary like object. It must implement key and
+    __getitem__ methods.
+
+    Returns
+    -------
+    df : pandas DataFrame
+        Columns from each Dataframe joined side by side.
+
+    """
+    keys = list(data.keys())
+    df = data[keys[0]]
+    for i in range(1, len(keys)):
+        lsuf = keys[i-1]
+        rsuf = keys[i]
+        df = df.join(data[keys[i]],
+                     lsuffix  = f'_{lsuf}',
+                     rsuffix = f'_{rsuf}',
+                     on  = 'Date',
+                     how = 'left')
+    return df
+
 def norm_hlc_by_open(data: StockData, inplace = False) -> StockData:
     """
     TO DO: Make this function more general (normalize_by_col)
