@@ -230,3 +230,51 @@ def batches_norm_hlc_by_open(stocks: StockData, period_len: int = 15):
     
     return batches
     
+def make_folds(data: Array, e: int = 0):
+    """
+    Create folds for leave-one batch out cross-validation
+
+    Parameters
+    ----------
+    data : Array
+        Array with shape (batches, len_period, emi_dim).
+    e : int, optional
+        Length of embargo period. This applies to
+        axis 1 of array. Indicates the number of periods
+        to ignore from the left and from the right. The default is 0.
+
+    Raises
+    ------
+    Exception
+        If e >= len_period - 1 all the data is discarded. 
+
+    Returns
+    -------
+    list with tuples. The first entry of each tuple is a training data set
+    the second entry is a test data set.
+
+    """
+    len_period = data.shape[1]
+    nbatch = data.shape[0]
+    idx = list(range(0, e)) + list(range(len_period - 1, len_period - 1 - e, -1))
+    idx = jnp.array(idx)
+    idx = jnp.unique(idx)
+    if len(idx) >= len_period:
+        raise Exception(f"Embargo parameter e = {e} is too large. There's no data left")
+    
+    folds = []
+    for i in range(1, nbatch + 1):
+        train = jnp.concatenate([data[0:nbatch - i], data[nbatch -i + 1:]])
+        test = data[nbatch -i]
+        # Embargo some data
+        if e > 0:
+            test = jnp.delete(test, idx, axis = 0)
+        folds.append( (train,  test) )
+    return folds
+            
+        
+    
+    
+    
+    
+    
