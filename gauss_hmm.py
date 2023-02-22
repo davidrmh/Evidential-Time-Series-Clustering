@@ -5,7 +5,8 @@ def fit_model_em(model,
                  train_data,
                  num_states,
                  init_method,
-                 key):
+                 key,
+                 **kwargs):
     
     # Emission dimension is deduced from train_data
     emi_dim = train_data.shape[-1]
@@ -16,7 +17,7 @@ def fit_model_em(model,
     
     # Initialize
     params, prop = hmm.initialize(key = key,
-                                  method = init_method)
+                                  method = init_method, **kwargs)
     
     # Fit with EM
     params, loglike = hmm.fit_em(params,
@@ -25,9 +26,9 @@ def fit_model_em(model,
     return hmm, params, loglike
 
 def cross_val_states_em(model, states, folds, init_method, key):
+    avgloglike = np.zeros(len(states))
     for i, s in enumerate(states):
         print(f'=== Starting fitting with {s} states === \n')
-        avgloglike = np.zeros(len(states))
         for f in folds:
             train, test = f
             hmm ,par, loglike = fit_model_em(model, train, s, init_method, key)
