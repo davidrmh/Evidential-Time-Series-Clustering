@@ -5,7 +5,8 @@ import numpy as np
 from typing import Union, Tuple, Optional
 from jaxtyping import Float, Array
 from copy import deepcopy
-
+import pickle
+from datetime import datetime
 
 class StockData(dict):
     def __init__(self,
@@ -271,10 +272,14 @@ def make_folds(data: Array, e: int = 0):
             test = jnp.delete(test, idx, axis = 0)
         folds.append( (train,  test) )
     return folds
-            
+
+def save_checkpoint(obj, dirpath = "./experiments", fname="experiment"):
+    cwd = os.getcwd()
+    if not os.path.exists(dirpath):
+        os.mkdir(dirpath)
+    fname = os.path.join(dirpath, fname)
+    with open(fname, 'wb') as f:
+        pickle.dump(obj, f)
+        print('Object saved')
+
         
-    
-    
-    
-    
-    
