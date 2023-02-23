@@ -44,3 +44,7 @@ The paper **2007-Spectral clustering and embedding with hidden Markov models** p
     * Create the pair $(S_i, S_j)$ corresponding to this correlation coefficient and do pairs trading.
     
     * I need to think how to use the uncertainty quantification in my favor.
+  
+## Some observations
+
+* When trying to reproduce spectral clustering, while doing cross-validation to find the best number of states in each HHM, I noticed that for certain stocks (e.g. ABBV, BMY) when the number of states increases the average validation marginal log-likelihood also increases. Looking at the chart price of these stocks I found that there's no clear trend during the time period (whole 2022). The price paths are characterized by several up and downtrends. On the other hand, for stock series in which the average validation marginal log-likehood decreases with the number of states, it is easier to see a well consolidated trend during the period of time.
