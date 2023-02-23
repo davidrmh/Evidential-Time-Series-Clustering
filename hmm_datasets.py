@@ -277,9 +277,13 @@ def save_checkpoint(obj, dirpath = "./experiments", fname="experiment"):
     cwd = os.getcwd()
     if not os.path.exists(dirpath):
         os.mkdir(dirpath)
-    fname = os.path.join(dirpath, fname)
+    fname = os.path.join(dirpath, fname) + '.pkl'
     with open(fname, 'wb') as f:
         pickle.dump(obj, f)
-        print('Object saved')
+        print('\n Object saved \n')
 
-        
+def load_checkpoint(filepath):
+    with open(filepath, 'rb') as f:
+        obj = pickle.load(f)
+    return obj
+       
