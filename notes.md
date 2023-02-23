@@ -4,11 +4,23 @@
 
 * The obvious way of representing time series data is by using a table for each stock. Each row corresponds to an observation at a certain time $t$. The columns are attributes measured for that particular stock.
         
-* One disadvantage of this representation is that we have to fit one HMM for each stock series.
+* **Disadvantages**:
+  * We have to fit one HMM for each stock series.
+
+* **Advantages**:
+  * We can compute the product kernel and thus apply spectral clustering (see below).
+  * The number of states are interpretable (see below).
 
 ### One HMM representing a whole market segment.
 
 * In this representation each column contains several attributes from different stocks. So we only need to fit a single HMM representing the joint dynamics of the market or segment overall.
+
+* **Disadvantages**: 
+  * We can't apply the product kernel and perform spectral clustering (see below).
+  * Lack of interpretability for the number of states (see below).
+
+* **Advantages**:
+  * Fast.
 
 ### Fitting models
 
@@ -48,3 +60,6 @@ The paper **2007-Spectral clustering and embedding with hidden Markov models** p
 ## Some observations
 
 * When trying to reproduce spectral clustering, while doing cross-validation to find the best number of states in each HHM, I noticed that for certain stocks (e.g. ABBV, BMY) when the number of states increases the average validation marginal log-likelihood also increases. Looking at the chart price of these stocks I found that there's no clear trend during the time period (whole 2022). The price paths are characterized by several up and downtrends. On the other hand, for stock series in which the average validation marginal log-likehood decreases with the number of states, it is easier to see a well consolidated trend during the period of time.
+
+* For some stocks, roughly, the "optimal" number of states corresponds to the number of well-consolidated trends during the time period under consideration.
+  * **IDEA**: Can we reduce the dimensionality of the time series (e.g. using Perceptually Important Points) and obtain a better interpretation of the number of states?
