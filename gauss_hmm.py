@@ -23,7 +23,7 @@ def fit_model_em(model,
     # Fit with EM
     params, loglike = hmm.fit_em(params,
                                  prop,
-                                 train_data)
+                                 train_data, verbose = False)
     return hmm, params, loglike
 
 def cross_val_states_em(model, states, folds, init_method, key, **kwargs):
@@ -47,8 +47,8 @@ def psi(mu1, mu2, cov1, cov2, beta = 0.5):
     det_cov2 = jnp.linalg.det(cov2)
     
     # To avoid nan
-    if det_cov1 == 0 or det_cov2 == 0:
-        return 0
+    if det_cov1 == 0.0 or det_cov2 == 0.0:
+        return 
     
     quad_cov1 = mu1.T @ cov1_inv @ mu1
     quad_cov2 = mu2.T @ cov2_inv @ mu2
@@ -56,3 +56,11 @@ def psi(mu1, mu2, cov1, cov2, beta = 0.5):
     factor1 = (det_cov_dag ** 0.5) * (det_cov1 ** (-0.5 * beta)) * (det_cov2 ** (-0.5 * beta))
     factor2 = jnp.exp(-0.5 * beta * (quad_cov1 + quad_cov2 - quad_cov_dag))
     return factor1 * factor2
+
+def product_kernel(param1, param2, period_len, beta = 0.5):
+    # Initial distributions
+    init1 = param1.initial.probs
+    init2 = param2.initial.probs
+    
+    
+    
